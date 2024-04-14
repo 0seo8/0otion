@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import React, { ElementRef, useEffect, useRef, useState } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
+import UserItem from '@/app/(main)/_components/user-item';
 import { cn } from '@/lib/utils';
 
 export default function Navigation() {
@@ -116,7 +117,7 @@ export default function Navigation() {
           <ChevronsLeft className="size-6" />
         </div>
         <div>
-          <p>Action items</p>
+          <UserItem />
           <div className="mt-4">
             <p>Documents</p>
             <div
