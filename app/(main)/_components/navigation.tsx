@@ -1,15 +1,26 @@
 'use client';
 
-import { ChevronsLeft, MenuIcon } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { useMutation } from 'convex/react';
+import { ChevronsLeft, MenuIcon, Plus, PlusCircle, Search, Settings } from 'lucide-react';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import React, { ElementRef, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useMediaQuery } from 'usehooks-ts';
 
+import DocumentList from '@/app/(main)/_components/document-list';
+import { Item } from '@/app/(main)/_components/item';
 import UserItem from '@/app/(main)/_components/user-item';
+import { api } from '@/convex/_generated/api';
+import { useSearch } from '@/hooks/use-search';
+import { useSettings } from '@/hooks/use-settings';
 import { cn } from '@/lib/utils';
 
 export default function Navigation() {
+  const router = useRouter();
+  const settings = useSettings();
+  const search = useSearch();
   const pathname = usePathname();
+  const params = useParams();
   const isMobile = useMediaQuery('(max-width: 780px)');
 
   const isResizingRef = useRef(false);
@@ -17,7 +28,7 @@ export default function Navigation() {
   const navbarRef = useRef<ElementRef<'div'>>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
-
+  const create = useMutation(api.documents.create);
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -79,6 +90,18 @@ export default function Navigation() {
     }, 300);
   };
 
+  const handleCreate = () => {
+    const promise = create({
+      title: 'Untitled',
+    });
+
+    toast.promise(promise, {
+      loading: 'Creating Document',
+      success: 'Document Created',
+      error: 'Error Creating Document',
+    });
+  };
+
   useEffect(() => {
     if (isMobile) {
       collapse();
@@ -99,16 +122,15 @@ export default function Navigation() {
     <>
       <aside
         className={cn(
-          'group/sidebar relative z-[9999] flex h-full w-60' + ' flex-col overscroll-y-auto bg-secondary',
+          'group/sidebar h-full bg-secondary overflow-y-auto relative flex w-60 flex-col z-[99999]',
           isResetting && 'transition-all ease-in-out duration-300',
-          isMobile && 'w-0',
+          isMobile && 'w-0 ',
         )}
         ref={sidebarRef}
       >
         <div
           className={cn(
-            'absolute right-2 top-3 size-6 rounded-sm' +
-              ' text-muted-foreground opacity-0 transition hover:bg-neutral-300 group-hover/sidebar:opacity-100 dark:hover:bg-neutral-600',
+            'h-6 w-6 text-muted-foreground rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600 absolute top-3 right-2 opacity-0 group-hover/sidebar:opacity-100 transition',
             isMobile && 'opacity-100',
           )}
           onClick={collapse}
@@ -118,10 +140,16 @@ export default function Navigation() {
         </div>
         <div>
           <UserItem />
+          <Item icon={Search} isSearch label="search" onclick={search.onOpen} />
+          <Item icon={Settings} label="Settings" onclick={settings.onOpen} />
+          <Item icon={PlusCircle} label="New Page" onclick={handleCreate} />
           <div className="mt-4">
-            <p>Documents</p>
+            <DocumentList />
+            <Item icon={Plus} label="Add a page" onclick={handleCreate} />
             <div
-              className="absolute right-0 top-0 h-full w-1 cursor-ew-resize bg-primary/10 opacity-0 transition group-hover/sidebar:opacity-100"
+              className="absolute right-0
+              top-0 h-full  w-1 cursor-ew-resize bg-primary/10 opacity-0
+              transition group-hover/sidebar:opacity-100"
               onClick={resetWidth}
               onMouseDown={handleMouseDown}
             />
@@ -136,8 +164,8 @@ export default function Navigation() {
         )}
         ref={navbarRef}
       >
-        <nav className=" w-full bg-transparent px-3 py-2">
-          {isCollapsed && <MenuIcon className="size-6 text-muted-foreground" onClick={resetWidth} />}
+        <nav className="w-full bg-transparent px-3 py-2">
+          {isCollapsed && <MenuIcon className=" size-6 text-muted-foreground" onClick={resetWidth} role="button" />}
         </nav>
       </div>
     </>

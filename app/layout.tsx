@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import { ConvexClientProvider } from '@/components/providers/convex-provider';
 import { ThemeProvider } from '@/components/providers/theme-providers';
@@ -40,8 +41,9 @@ export default function RootLayout({
             defaultTheme="system"
             disableTransitionOnChange
             enableSystem
-            storageKey="rotion-theme-2"
+            storageKey="rotion-theme"
           >
+            <Toaster position="bottom-center" />
             {children}
           </ThemeProvider>
         </ConvexClientProvider>

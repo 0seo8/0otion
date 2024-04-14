@@ -25,7 +25,7 @@ export default function Navbar() {
       <Logo />
       <div className="flex w-full items-center justify-between gap-x-2 md:ml-auto md:justify-end">
         {isLoading && <Spinner />}
-        {isAuthenticated && !isLoading && (
+        {!isAuthenticated && !isLoading && (
           <>
             <SignInButton mode="modal">
               <Button size="sm" variant={'ghost'}>
@@ -37,7 +37,7 @@ export default function Navbar() {
             </SignInButton>
           </>
         )}
-        {!isAuthenticated && !isLoading && (
+        {isAuthenticated && !isLoading && (
           <>
             <Button asChild size="sm" variant="ghost">
               <Link href="/documents">Enter Rotion</Link>
